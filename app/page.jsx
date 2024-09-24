@@ -171,6 +171,7 @@ export default function Home() {
                         {enemies.map((enemy) => (
                             <div
                                 className="flex flex-col justify-center items-center border-red"
+                                key={enemy.id}
                                 onClick={() => {
                                     setTarget(target === enemy ? null : enemy);
                                 }}
