@@ -7,14 +7,15 @@ const gameStates = {
     battle: 1,
 };
 
-const player = {
-    health: 10,
-    attack: 10,
-    energy: 0,
-};
-
 export default function Home() {
     const [currentGameState, setCurrentGameState] = useState(gameStates.start);
+    const [playerStats, updatePlayerStats] = useState({
+        health: 10,
+        maxHealth: 10,
+        attack: 10,
+        defense: 10,
+        energy: 0,
+    });
 
     const onStart = function () {
         setCurrentGameState(gameStates.battle);
@@ -52,9 +53,33 @@ export default function Home() {
                 }`}
             >
                 {/** battle ground */}
-                <div className="h-4/6 m-2"></div>
+                <div className="h-3/5 m-2"></div>
                 {/** player */}
-                <div className="h-2/6 m-2">
+                <div className="h-2/5 m-2">
+                    {/** stats */}
+                    <div className="flex flex-col gap-1 p-4">
+                        <div className="text-white flex justify-center items-center gap-8">
+                            <div>
+                                {`HP:${playerStats.health}/${playerStats.maxHealth}`}
+                            </div>
+                            <div>{`DEF:${playerStats.defense}`}</div>
+                            <div>{`ATK:${playerStats.attack}`}</div>
+                            <div>{`ENERGY:${playerStats.energy}`}</div>
+                        </div>
+                        <div className="w-full h-full p-1 border-white border-2 flex justify-start">
+                            <div
+                                className="h-2 bg-white"
+                                style={{
+                                    width: `${
+                                        (playerStats.health /
+                                            playerStats.maxHealth) *
+                                        100
+                                    }%`,
+                                }}
+                            ></div>
+                        </div>
+                    </div>
+
                     {/** move options */}
                     <div className="grid grid-cols-2 grid-rows-2 place-items-center gap-2">
                         <div className="w-full text-white border-white border-2 text-center py-6">
