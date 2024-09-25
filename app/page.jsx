@@ -78,7 +78,7 @@ export default function Home() {
     };
 
     return (
-        <main className="fixed h-screen w-full">
+        <main className="fixed h-dvh w-full">
             {/** start screen */}
             <div
                 className={`h-full flex flex-col justify-center items-center ${
