@@ -108,10 +108,10 @@ export default function Home() {
                 }`}
             >
                 {/** battle ground */}
-                <div className="h-3/5 m-2 flex justify-center items-center">
+                <div className="h-3/5 flex justify-center items-center p-4">
                     {/** target stats */}
                     <div
-                        className={`w-full h-full flex flex-col p-4 gap-1 ${
+                        className={`w-full h-full flex flex-col px-4 gap-1 ${
                             target ? "" : "hidden"
                         }`}
                     >
@@ -199,7 +199,7 @@ export default function Home() {
                     </div>
                 </div>
                 {/** player information and moveset */}
-                <div className="h-2/5 m-2">
+                <div className="h-2/5 flex flex-col justify-end p-4">
                     {/** stats */}
                     <div className="flex flex-col gap-1 p-4">
                         <div className="text-white flex justify-center items-center gap-8">
