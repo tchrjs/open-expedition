@@ -107,11 +107,10 @@ export default function Home() {
                     currentGameState === gameStates.battle ? "" : "hidden"
                 }`}
             >
-                {/** battle ground */}
-                <div className="h-3/5 flex justify-center items-center p-4">
-                    {/** target stats */}
+                {/** target stats */}
+                <div className="w-full h-1/6 p-4">
                     <div
-                        className={`w-full h-full flex flex-col px-4 gap-1 ${
+                        className={`w-full flex flex-col p-2 ${
                             target ? "" : "hidden"
                         }`}
                     >
@@ -155,7 +154,9 @@ export default function Home() {
                             }`}</div>
                         </div>
                     </div>
-
+                </div>
+                {/** battle ground */}
+                <div className="w-full h-3/6 flex justify-center items-center p-4">
                     {/** player models */}
                     <div className="absolute flex flex-col gap-2 left-0 ml-14">
                         <div className="flex flex-col justify-center items-center border-red">
@@ -198,11 +199,11 @@ export default function Home() {
                         ))}
                     </div>
                 </div>
-                {/** player information and moveset */}
-                <div className="h-2/5 flex flex-col justify-end p-4">
+                {/** player information and movesets */}
+                <div className="w-full h-2/6 flex flex-col justify-end p-4">
                     {/** stats */}
                     <div className="flex flex-col gap-1 p-4">
-                        <div className="text-white flex justify-center items-center gap-8">
+                        <div className="text-white flex justify-center items-center space-x-4">
                             <div>
                                 {`HP:${playerStats.health}/${playerStats.maxHealth}`}
                             </div>
@@ -233,7 +234,6 @@ export default function Home() {
                             ></div>
                         </div>
                     </div>
-
                     {/** move options */}
                     <div className="grid grid-cols-2 grid-rows-2 place-items-center gap-2">
                         <div
