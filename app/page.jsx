@@ -11,7 +11,8 @@ const basePlayerStats = {
     health: 100,
     maxHealth: 100,
     attack: 10,
-    shield: 0,
+    shield: 15,
+    maxShield: 15,
     energy: 0,
 };
 
@@ -22,12 +23,14 @@ const baseEnemyStats = {
     maxHealth: 100,
     attack: 10,
     shield: 15,
+    maxShield: 15,
     energy: 0,
 };
 
 export default function Home() {
     const [currentGameState, setCurrentGameState] = useState(gameStates.start);
     const [playerStats, setPlayerStats] = useState(basePlayerStats);
+    const [isCurrentTurn, setIsCurrentTurn] = useState(true);
     const [enemies, setEnemies] = useState([]);
     const [target, setTarget] = useState(null);
 
@@ -37,12 +40,15 @@ export default function Home() {
         setEnemies([baseEnemyStats]);
     };
 
-    const onBasicAttack = function () {
+    // player actions
+    const onBasicAttack = async function () {
+        setIsCurrentTurn(false);
         let currentTarget = target;
 
         // If no target is selected, automatically choose a target.
         if (!currentTarget) {
             currentTarget = getRandomArrayValue(enemies);
+            setTarget(currentTarget);
         }
 
         // Calculate damage.
@@ -57,6 +63,8 @@ export default function Home() {
 
         // Update target info.
         updateTarget(currentTarget);
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        setIsCurrentTurn(true);
     };
 
     const onSkills = function () {};
@@ -103,62 +111,64 @@ export default function Home() {
             </div>
             {/** battle screen */}
             <div
-                className={`h-full ${
+                className={`h-full p-4 ${
                     currentGameState === gameStates.battle ? "" : "hidden"
                 }`}
             >
                 {/** target stats */}
-                <div className="w-full h-1/6 p-4">
-                    <div
-                        className={`w-full flex flex-col p-2 ${
-                            target ? "" : "hidden"
-                        }`}
-                    >
-                        <div className=" text-white">{target?.name ?? ""}</div>
-                        <div className="w-full p-1 border-white border-2 flex justify-start">
-                            <div
-                                className="h-2 bg-red-700"
-                                style={{
-                                    width: `${
-                                        target
-                                            ? (target.health /
-                                                  target.maxHealth) *
-                                              100
-                                            : 0
-                                    }%`,
-                                }}
-                            ></div>
-                            <div
-                                className="h-2 bg-orange-600"
-                                style={{
-                                    width: `${
-                                        target
-                                            ? (target.shield /
-                                                  target.maxHealth) *
-                                              100
-                                            : 0
-                                    }%`,
-                                }}
-                            ></div>
-                        </div>
-                        <div className="text-white flex justify-start items-center gap-8">
-                            <div>
-                                {`${
-                                    target
-                                        ? `HP:${target.health}/${target.maxHealth}`
-                                        : ""
-                                }`}
+                <div className="w-full h-1/6">
+                    <div className={`${target ? "opacity-1" : "opacity-0"}`}>
+                        <div className="flex flex-col gap-1 px-4">
+                            <div className="text-white">
+                                {target?.name ?? ""}
                             </div>
-                            <div>{`${
-                                target ? `SHIELD:${target.shield}` : ""
-                            }`}</div>
+                            <div className="w-full p-1 border-white border-2 flex">
+                                <div
+                                    className="h-2 bg-red-700"
+                                    style={{
+                                        width: `${
+                                            target
+                                                ? (target.health /
+                                                      target.maxHealth) *
+                                                  100
+                                                : 0
+                                        }%`,
+                                    }}
+                                ></div>
+                                <div
+                                    className="h-2 bg-orange-600"
+                                    style={{
+                                        width: `${
+                                            target
+                                                ? (target.shield /
+                                                      target.maxHealth) *
+                                                  100
+                                                : 0
+                                        }%`,
+                                    }}
+                                ></div>
+                            </div>
+                            <div className="text-white flex justify-start items-center gap-8 text-sm">
+                                <div>
+                                    {`${
+                                        target
+                                            ? `HP:${target.health}/${target.maxHealth}`
+                                            : ""
+                                    }`}
+                                </div>
+                                <div>{`${
+                                    target
+                                        ? `SHIELD:${target.shield}/${target.maxShield}`
+                                        : ""
+                                }`}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 {/** battle ground */}
-                <div className="w-full h-3/6 flex justify-center items-center p-4">
+                <div className="w-full h-3/6 flex justify-center items-center">
                     {/** player models */}
-                    <div className="absolute flex flex-col gap-2 left-0 ml-14">
+                    <div className="absolute flex flex-col gap-2 -translate-x-24">
                         <div className="flex flex-col justify-center items-center border-red">
                             <div className="w-5 h-5 bg-blue-800"></div>
                             <div className="w-7 h-12 bg-blue-800"></div>
@@ -168,7 +178,7 @@ export default function Home() {
                         </div>
                     </div>
                     {/** enemy models */}
-                    <div className="absolute flex flex-col gap-2 right-0 mr-14">
+                    <div className="absolute flex flex-col gap-2 translate-x-24">
                         {enemies.map((enemy) => (
                             <div
                                 className="flex flex-col justify-center items-center border-red"
@@ -200,14 +210,14 @@ export default function Home() {
                     </div>
                 </div>
                 {/** player information and movesets */}
-                <div className="w-full h-2/6 flex flex-col justify-end p-4">
+                <div className="w-full h-2/6 flex flex-col justify-end gap-3">
                     {/** stats */}
-                    <div className="flex flex-col gap-1 p-4">
-                        <div className="text-white flex justify-center items-center space-x-4">
+                    <div className="flex flex-col gap-1 px-4">
+                        <div className="text-white flex justify-center items-center space-x-4 text-sm">
                             <div>
                                 {`HP:${playerStats.health}/${playerStats.maxHealth}`}
                             </div>
-                            <div>{`SHIELD:${playerStats.shield}`}</div>
+                            <div>{`SHIELD:${playerStats.shield}/${playerStats.maxShield}`}</div>
                             <div>{`ATK:${playerStats.attack}`}</div>
                             <div>{`ENERGY:${playerStats.energy}`}</div>
                         </div>
@@ -235,27 +245,33 @@ export default function Home() {
                         </div>
                     </div>
                     {/** move options */}
-                    <div className="grid grid-cols-2 grid-rows-2 place-items-center gap-2">
+                    <div
+                        className={`grid grid-cols-2 grid-rows-2 place-items-center gap-2 ${
+                            isCurrentTurn
+                                ? ""
+                                : "brightness-50 pointer-events-none"
+                        }`}
+                    >
                         <div
-                            className="w-full text-white border-white border-2 text-center py-6"
+                            className="w-full text-white border-white border-2 text-center py-5"
                             onClick={onBasicAttack}
                         >
                             basic attack
                         </div>
                         <div
-                            className="w-full text-white border-white border-2 text-center py-6"
+                            className="w-full text-white border-white border-2 text-center py-5"
                             onClick={onFocus}
                         >
                             focus
                         </div>
                         <div
-                            className="w-full text-white border-white border-2 text-center py-6"
+                            className="w-full text-white border-white border-2 text-center py-5"
                             onClick={onSkills}
                         >
                             skills
                         </div>
                         <div
-                            className="w-full text-white border-white border-2 text-center py-6"
+                            className="w-full text-white border-white border-2 text-center py-5"
                             onClick={onGuard}
                         >
                             guard
