@@ -133,7 +133,7 @@ export default function Home() {
         );
 
         // Check player and enemy statuses.
-        if (playerStats.health === 0) {
+        if (newPlayerStats.health === 0) {
             console.log("Game Over");
             setPlayerStats({ ...newPlayerStats, health: 0 });
         } else {
