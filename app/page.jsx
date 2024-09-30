@@ -8,19 +8,19 @@ const gameStates = {
 };
 
 const basePlayerStats = {
-    health: 100,
-    maxHealth: 100,
+    health: 50,
+    maxHealth: 50,
     attack: 10,
-    shield: 15,
+    shield: 0,
     maxShield: 15,
-    energy: 0,
+    energy: 1,
 };
 
 const baseEnemyStats = {
     id: 0,
     name: "enemy1",
-    health: 100,
-    maxHealth: 100,
+    health: 50,
+    maxHealth: 50,
     attack: 10,
     shield: 15,
     maxShield: 15,
@@ -41,8 +41,9 @@ export default function Home() {
     };
 
     // player actions
-    const onBasicAttack = async function () {
+    const onBasicAttack = function () {
         setIsCurrentTurn(false);
+        setPlayerStats({ ...playerStats, energy: playerStats.energy - 1 });
         let currentTarget = target;
 
         // If no target is selected, automatically choose a target.
@@ -62,26 +63,108 @@ export default function Home() {
         }
 
         // Update target info.
-        updateTarget(currentTarget);
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        setIsCurrentTurn(true);
+        let enemiesExist = updateTarget(currentTarget);
+        console.log(enemiesExist);
+        onTurnEnd(
+            { ...playerStats, energy: playerStats.energy - 1 },
+            false,
+            enemiesExist
+        );
     };
 
-    const onSkills = function () {};
-    const onFocus = function () {};
-    const onGuard = function () {};
+    const onSkills = function () {
+        setIsCurrentTurn(false);
+        onTurnEnd({ ...playerStats, energy: playerStats.energy - 1 });
+    };
+
+    const onFocus = function () {
+        setIsCurrentTurn(false);
+        onTurnEnd(playerStats, true);
+    };
+
+    const onGuard = async function () {
+        setIsCurrentTurn(false);
+        let newPlayerStats = playerStats;
+        newPlayerStats.shield = playerStats.shield + 15;
+        if (newPlayerStats.shield > playerStats.maxShield)
+            newPlayerStats.shield = playerStats.maxShield;
+        onTurnEnd({ ...newPlayerStats, energy: newPlayerStats.energy - 1 });
+    };
+
+    const onTurnEnd = async function (
+        newPlayerStats,
+        ignore = false,
+        enemiesExist = true
+    ) {
+        // Check if enemies still exist. If not game ends.
+        setPlayerStats(newPlayerStats);
+        if (!enemiesExist) {
+            console.log("Game Over!");
+            setIsCurrentTurn(false);
+            setPlayerStats(newPlayerStats);
+            return;
+        }
+
+        // Check if player still has energy. Ignore when skill builds energy.
+        if (!ignore && newPlayerStats.energy > 0) {
+            console.log("Game Won!");
+            setIsCurrentTurn(true);
+            setPlayerStats(newPlayerStats);
+            return;
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        // enemy performs attack.
+        await Promise.all(
+            enemies.map(async (enemy) => {
+                // Calculate damage.
+                let damage = newPlayerStats.shield - enemy.attack;
+                if (damage < 0) {
+                    newPlayerStats.shield = 0;
+                    newPlayerStats.health = newPlayerStats.health + damage;
+                    if (newPlayerStats.health < 0) newPlayerStats.health = 0;
+                } else {
+                    newPlayerStats.shield -= enemy.attack;
+                }
+                setPlayerStats(newPlayerStats);
+                await new Promise((resolve) => setTimeout(resolve, 500));
+            })
+        );
+
+        // Check player and enemy statuses.
+        if (playerStats.health === 0) {
+            console.log("Game Over");
+            setPlayerStats({ ...newPlayerStats, health: 0 });
+        } else {
+            setPlayerStats({
+                ...newPlayerStats,
+                energy: newPlayerStats.energy + 1,
+            });
+            setIsCurrentTurn(true);
+        }
+    };
 
     const updateTarget = function (updatedTarget) {
-        const updatedEnemies = enemies.map((enemy) =>
-            enemy.id === updatedTarget.id ? updatedTarget : enemy
-        );
-        setEnemies(updatedEnemies);
-        setTarget(updatedTarget);
+        if (updatedTarget.health === 0) {
+            let newEnemies = enemies.filter(
+                (enemy) => enemy.id !== updatedTarget.id
+            );
+            setEnemies(newEnemies);
+            setTarget(null);
+            return newEnemies.length > 0;
+        } else {
+            const updatedEnemies = enemies.map((enemy) =>
+                enemy.id === updatedTarget.id ? updatedTarget : enemy
+            );
+            setEnemies(updatedEnemies);
+            setTarget(updatedTarget);
+            return true;
+        }
     };
 
     const getRandomArrayValue = function (arr) {
         const randomIndex = Math.floor(Math.random() * arr.length);
-        console.log(arr[randomIndex]);
         return arr[randomIndex];
     };
 
@@ -246,7 +329,7 @@ export default function Home() {
                     </div>
                     {/** move options */}
                     <div
-                        className={`grid grid-cols-2 grid-rows-2 place-items-center gap-2 ${
+                        className={`grid grid-cols-2 grid-rows-2 md:grid-cols-4 md:grid-rows-none place-items-center gap-2 ${
                             isCurrentTurn
                                 ? ""
                                 : "brightness-50 pointer-events-none"
