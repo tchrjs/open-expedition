@@ -251,7 +251,11 @@ export default function Home() {
                 {/** battle ground */}
                 <div className="w-full h-3/6 flex justify-center items-center">
                     {/** player models */}
-                    <div className="absolute flex flex-col gap-2 -translate-x-24">
+                    <div
+                        className={`absolute flex flex-col gap-2 -translate-x-24 ${
+                            playerStats.health === 0 ? "opacity-0" : "opacity-1"
+                        }`}
+                    >
                         <div className="flex flex-col justify-center items-center border-red">
                             <div className="w-5 h-5 bg-blue-800"></div>
                             <div className="w-7 h-12 bg-blue-800"></div>
