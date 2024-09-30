@@ -329,7 +329,7 @@ export default function Home() {
                     </div>
                     {/** move options */}
                     <div
-                        className={`grid grid-cols-2 grid-rows-2 md:grid-cols-4 md:grid-rows-none place-items-center gap-2 ${
+                        className={`grid grid-cols-2 grid-rows-2 sm:grid-cols-4 sm:grid-rows-none place-items-center gap-2 ${
                             isCurrentTurn
                                 ? ""
                                 : "brightness-50 pointer-events-none"
